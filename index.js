@@ -131,6 +131,92 @@ app.put("/buy_details/:id", function (req, res) {
   );
 });
 // update ==================
+// add product ================
+app.post("/products", function (req, res) {
+  const { name} = req.body;
+
+  // Create an object to store the data
+  const dataproduct = {
+    name: name
+  };
+  // Perform the database insertion
+  connection.query(
+    "INSERT INTO product SET ?",
+    dataproduct,
+    function (error, results, fields) {
+      console.log(dataproduct);
+      if (error) {
+        console.error("Can not into the database: " + error.stack);
+        res.status(500).json({ error: "Can not into the database" });
+        return;
+      }
+      // Successful insertion
+      res.status(200).json({ message: "inserted successfully " });
+    }
+  );
+});
+// add product ================
+// update product ==================
+app.put("/products/:id", function (req, res) {
+  const id = req.params.id;
+  const { name } = req.body;
+
+  // Create an object to store the updated data
+  const updatedData = {
+    name: name
+  };
+
+  // Perform the database update
+  connection.query(
+    "UPDATE product SET ? WHERE id = ?",
+    [updatedData, id],
+    function (error, results, fields) {
+      if (error) {
+        console.error("Error updating data in the database: " + error.stack);
+        res.status(500).json({ error: "Error updating data in the database" });
+        return;
+      }
+
+      // Check if any rows were affected
+      if (results.affectedRows === 0) {
+        res.status(404).json({ error: "Data not found in the database" });
+        return;
+      }
+
+      // Successful update
+      res.status(200).json({ message: "Data updated successfully" });
+    }
+  );
+});
+// update product ==================
+// delete product ==================
+app.delete("/products/:id", function (req, res) {
+  const id = req.params.id;
+
+  // Perform the database deletion
+  connection.query(
+    "DELETE FROM product WHERE id = ?",
+    id,
+    function (error, results, fields) {
+      if (error) {
+        console.error("Error deleting data from the database: " + error.stack);
+        res
+          .status(500)
+          .json({ error: "Error deleting data from the database" });
+        return;
+      }
+
+      // Check if any rows were affected
+      if (results.affectedRows === 0) {
+        res.status(404).json({ error: "Record need to delete not found in the database" });
+        return;
+      }
+      // Successful deletion
+      res.status(200).json({ message: "Data deleted successfully " });
+    }
+  );
+});
+// delete product ==================
 
 app.listen(4000, function () {
   console.log("CORS-enabled web server listening on port 4000");
